@@ -1,0 +1,14 @@
+# HTTP requests with session management
+requests>=2.31.0
+
+# MySQL database connector
+PyMySQL>=1.1.0
+
+# Retry logic with exponential backoff
+tenacity>=8.2.0
+
+# Environment variable management
+python-dotenv>=1.0.0
+
+# Progress bars (optional but nice for UX)
+tqdm>=4.66.0
