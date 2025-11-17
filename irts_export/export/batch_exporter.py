@@ -1,5 +1,5 @@
 """
-Batch exporter for SDAIA metadata and files
+Batch exporter for libsafe metadata and files
 Implements incremental CSV writing for crash recovery and memory efficiency
 """
 
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 class BatchExporter:
     """
-    Exports metadata and PDF files from DSpace repository to SDAIA directory
+    Exports metadata and PDF files from DSpace repository to libsafe directory
     with incremental CSV writing for crash recovery
     """
 
@@ -61,7 +61,7 @@ class BatchExporter:
         """
         self.db = db
         self.dspace = dspace_client
-        self.export_dir = export_dir or Config.SDAIA_EXPORT_DIRECTORY
+        self.export_dir = export_dir or Config.LIBSAFE_EXPORT_DIRECTORY
 
         # Statistics
         self.stats = {

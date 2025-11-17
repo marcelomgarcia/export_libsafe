@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SDAIA Metadata and Files Batch Export Script
+libsafe Metadata and Files Batch Export Script
 
 Secure Python implementation of the PHP exportMetadataAndPublicFilesInBatches script.
 Features:
@@ -31,7 +31,7 @@ def setup_logging(verbose: bool = False):
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler('export_sdaia.log'),
+            logging.FileHandler('export_libsafe.log'),
         ]
     )
 
@@ -39,7 +39,7 @@ def setup_logging(verbose: bool = False):
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(
-        description='Export SDAIA metadata and PDF files from DSpace repository'
+        description='Export libsafe metadata and PDF files from DSpace repository'
     )
     parser.add_argument(
         '--from-date',
@@ -60,13 +60,13 @@ def main():
     logger = logging.getLogger(__name__)
 
     logger.info("=" * 60)
-    logger.info("SDAIA Metadata and Files Export")
+    logger.info("libsafe Metadata and Files Export")
     logger.info("=" * 60)
 
     try:
         # Validate configuration
         Config.validate()
-        logger.info(f"Export directory: {Config.SDAIA_EXPORT_DIRECTORY}")
+        logger.info(f"Export directory: {Config.LIBSAFE_EXPORT_DIRECTORY}")
 
         # Connect to database
         logger.info("Connecting to database...")

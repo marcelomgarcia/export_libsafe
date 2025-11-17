@@ -1,5 +1,5 @@
 #!/bin/bash
-# Convenience script to run SDAIA export with Python virtual environment
+# Convenience script to run libsafe export with Python virtual environment
 
 set -e
 
@@ -12,4 +12,4 @@ if [ -d "venv" ]; then
 fi
 
 # Run export script with all arguments passed through
-python export_sdaia.py "$@"
+python export_libsafe.py "$@"

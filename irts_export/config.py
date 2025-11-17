@@ -28,7 +28,7 @@ class Config:
     REPOSITORY_API_URL = os.getenv('REPOSITORY_API_URL', '')
 
     # Export Configuration
-    SDAIA_EXPORT_DIRECTORY = Path(os.getenv('SDAIA_EXPORT_DIRECTORY', '/tmp/'))
+    LIBSAFE_EXPORT_DIRECTORY = Path(os.getenv('LIBSAFE_EXPORT_DIRECTORY', '/tmp/'))
 
     # Community Handles
     KAUST_RESEARCH_HANDLE = os.getenv('KAUST_RESEARCH_HANDLE', '10754/324602')

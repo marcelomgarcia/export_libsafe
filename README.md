@@ -1,4 +1,4 @@
-# SDAIA Metadata and Files Export
+# libsafe Metadata and Files Export
 
 Secure Python implementation of the PHP `exportMetadataAndPublicFilesInBatches` script for exporting DSpace repository metadata and PDF files.
 
@@ -30,12 +30,12 @@ Secure Python implementation of the PHP `exportMetadataAndPublicFilesInBatches` 
 ## Project Structure
 
 ```
-export_sdaia/
+export_libsafe/
 ├── .env                          # Credentials (DO NOT COMMIT)
 ├── .env.example                  # Template for credentials
 ├── .gitignore                    # Git ignore rules
 ├── requirements.txt              # Python dependencies
-├── export_sdaia.py              # Main entry point script
+├── export_libsafe.py            # Main entry point script
 ├── README.md                     # This file
 └── irts_export/                  # Main package
     ├── __init__.py
@@ -58,7 +58,7 @@ export_sdaia/
 ### 1. Install Python Dependencies
 
 ```bash
-cd /home/garcm0b/Work/export_sdaia
+cd /home/garcm0b/Work/export_libsafe
 pip install -r requirements.txt
 ```
 
@@ -86,7 +86,7 @@ nano .env
 
 ```bash
 # Make sure this directory exists and is writable
-ls -la /data/exports/sdaia/
+ls -la /data/exports/libsafe/
 ```
 
 ## Usage
@@ -94,19 +94,19 @@ ls -la /data/exports/sdaia/
 ### Basic Export (All Unembargoed Records)
 
 ```bash
-python export_sdaia.py
+python export_libsafe.py
 ```
 
 ### Export Records Added After Specific Date
 
 ```bash
-python export_sdaia.py --from-date 2024-01-01
+python export_libsafe.py --from-date 2024-01-01
 ```
 
 ### Enable Verbose Logging
 
 ```bash
-python export_sdaia.py --verbose
+python export_libsafe.py --verbose
 ```
 
 ### Resume After Crash
@@ -115,6 +115,10 @@ Simply re-run the same command. The script will:
 1. Read existing `metadata.csv`
 2. Skip handles already in CSV
 3. Continue from where it left off
+
+```bash
+uv run export_libsafe.py --verbose
+```
 
 ## How It Works
 
@@ -170,7 +174,7 @@ validate_safe_path(file_path, export_dir)
 
 ### CSV File
 
-Location: `/data/exports/sdaia/metadata.csv`
+Location: `/data/exports/libsafe/metadata.csv`
 
 Columns:
 - Handle
@@ -184,13 +188,13 @@ Columns:
 
 ### PDF Files
 
-Location: `/data/exports/sdaia/*.pdf`
+Location: `/data/exports/libsafe/*.pdf`
 
 Naming: `{handle_suffix}.pdf` (e.g., `123456.pdf` for handle `10754/123456`)
 
 ### Log File
 
-Location: `export_sdaia.log` (in current directory)
+Location: `export_libsafe.log` (in current directory)
 
 Contains detailed execution log for debugging.
 
@@ -211,20 +215,20 @@ The script handles various error conditions:
 
 ```bash
 # Watch CSV file grow
-tail -f /data/exports/sdaia/metadata.csv
+tail -f /data/exports/libsafe/metadata.csv
 
 # Count processed records
-wc -l /data/exports/sdaia/metadata.csv
+wc -l /data/exports/libsafe/metadata.csv
 ```
 
 ### Log Monitoring
 
 ```bash
 # Follow log file
-tail -f export_sdaia.log
+tail -f export_libsafe.log
 
 # Search for errors
-grep ERROR export_sdaia.log
+grep ERROR export_libsafe.log
 ```
 
 ## Comparison with PHP Version
@@ -258,8 +262,8 @@ cat .env
 
 ```bash
 # Create directory
-sudo mkdir -p /data/exports/sdaia/
-sudo chown $USER:$USER /data/exports/sdaia/
+sudo mkdir -p /data/exports/libsafe/
+sudo chown $USER:$USER /data/exports/libsafe/
 ```
 
 ### "Database connection failed"
