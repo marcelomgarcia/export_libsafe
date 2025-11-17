@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Optional
 from contextlib import contextmanager
 
 import pymysql
+from pymysql.connections import Connection
 from pymysql.cursors import DictCursor
 
 from ..config import Config
@@ -27,11 +28,11 @@ class DatabaseConnection:
 
     def __init__(
         self,
-        host: str = None,
-        user: str = None,
-        port: str = None,
-        password: str = None,
-        database: str = None,
+        host: str = "",
+        user: str = "",
+        port: int = 3306,
+        password: str = "",
+        database: str = "",
     ):
         """
         Initialize database connection
@@ -49,12 +50,12 @@ class DatabaseConnection:
         self.password = password or Config.MYSQL_PASSWORD
         self.database = database or Config.IRTS_DATABASE
 
-        self.connection = None
+        self.connection: Optional[Connection] = None
 
     def connect(self):
         """Establish database connection"""
         try:
-            self.connection = pymysql.connect(
+            self.connection = pymysql.connect(  # type: ignore[call-overload]
                 host=self.host,
                 user=self.user,
                 port=self.port,
@@ -83,6 +84,8 @@ class DatabaseConnection:
         """
         if not self.connection:
             self.connect()
+
+        assert self.connection is not None, "Connection should be established"
 
         cursor = self.connection.cursor()
         try:
@@ -120,7 +123,7 @@ class DatabaseConnection:
             cursor.execute(query, params or ())
             results = cursor.fetchall()
             logger.debug(f"Query returned {len(results)} rows")
-            return results
+            return results  # type: ignore[return-value]
 
     def get_handles_for_export(
         self,
@@ -252,7 +255,7 @@ class DatabaseConnection:
                 SELECT parentRowID FROM metadata
                 WHERE `source` = 'repository'
                 AND `field` = 'dspace.bitstream.name'
-                AND value LIKE '%.pdf'
+                AND value LIKE '%%.pdf'
                 AND `deleted` IS NULL
             )
         """

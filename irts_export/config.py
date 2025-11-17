@@ -15,17 +15,17 @@ class Config:
     """Configuration class that loads all settings from environment variables"""
 
     # Database Configuration
-    MYSQL_SERVER_IP = os.getenv('MYSQL_SERVER_IP')
+    MYSQL_SERVER_IP = os.getenv('MYSQL_SERVER_IP', '')
     MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
-    MYSQL_USER = os.getenv('MYSQL_USER')
-    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+    MYSQL_USER = os.getenv('MYSQL_USER', '')
+    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
     IRTS_DATABASE = os.getenv('IRTS_DATABASE', 'prod_irts')
 
     # DSpace Repository API
-    REPOSITORY_USER = os.getenv('REPOSITORY_USER')
-    REPOSITORY_PASSWORD = os.getenv('REPOSITORY_PASSWORD')
-    REPOSITORY_BASE_URL = os.getenv('REPOSITORY_BASE_URL')
-    REPOSITORY_API_URL = os.getenv('REPOSITORY_API_URL')
+    REPOSITORY_USER = os.getenv('REPOSITORY_USER', '')
+    REPOSITORY_PASSWORD = os.getenv('REPOSITORY_PASSWORD', '')
+    REPOSITORY_BASE_URL = os.getenv('REPOSITORY_BASE_URL', '')
+    REPOSITORY_API_URL = os.getenv('REPOSITORY_API_URL', '')
 
     # Export Configuration
     SDAIA_EXPORT_DIRECTORY = Path(os.getenv('SDAIA_EXPORT_DIRECTORY', '/tmp/'))

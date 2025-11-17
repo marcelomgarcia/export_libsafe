@@ -228,14 +228,27 @@ class DSpaceClient:
         logger.debug(f"Fetching bitstream content: {bitstream_uuid}")
 
         try:
-            # Attempt authentication if not already authenticated
-            if not self.bearer_token and not short_lived_token:
-                self.authenticate()
+            # Try unauthenticated request first (for public/open access files)
+            # This matches the PHP behavior (lines 33-44 in original code)
+            logger.debug(f"Attempting unauthenticated request for {bitstream_uuid}")
 
             response = self.session.get(
                 url,
                 timeout=Config.REQUEST_TIMEOUT,
             )
+
+            # If we get 401/403, try authenticating and retry
+            if response.status_code in (401, 403):
+                logger.info(f"Access denied, attempting authentication...")
+
+                if not self.bearer_token and not short_lived_token:
+                    self.authenticate()
+
+                # Retry with authentication
+                response = self.session.get(
+                    url,
+                    timeout=Config.REQUEST_TIMEOUT,
+                )
 
             return self._handle_response(response)
 
