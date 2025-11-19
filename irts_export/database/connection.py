@@ -127,13 +127,15 @@ class DatabaseConnection:
 
     def get_handles_for_export(
         self,
-        from_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> List[str]:
         """
         Get list of handles eligible for SDAIA export
 
         Args:
-            from_date: Optional date filter (YYYY-MM-DD format)
+            start_date: Optional start date filter (YYYY-MM-DD format) - inclusive
+            end_date: Optional end date filter (YYYY-MM-DD format) - inclusive
 
         Returns:
             List of handle strings
@@ -159,23 +161,50 @@ class DatabaseConnection:
         params = [Config.KAUST_RESEARCH_HANDLE, Config.KAUST_ETD_HANDLE]
 
         # Add date filter if provided (using parameterized query)
-        if from_date:
+        if start_date or end_date:
             query += """
                 AND `idInSource` IN (
                     SELECT `idInSource` FROM `metadata`
                     WHERE `source` = 'repository'
                     AND `field` = 'dspace.bitstream.uuid'
+            """
+
+            if start_date and end_date:
+                # Both dates: filter for range (exclude records added before start)
+                query += """
                     AND value NOT IN (
                         SELECT `value` FROM `metadata`
                         WHERE `source` = 'repository'
                         AND `field` = 'dspace.bitstream.uuid'
                         AND `added` < %s
                     )
-                    AND `added` > %s
+                    AND `added` >= %s
+                    AND `added` <= %s
+                """
+                params.extend([start_date, start_date, end_date])
+            elif start_date:
+                # Only start date: records added on or after start
+                query += """
+                    AND value NOT IN (
+                        SELECT `value` FROM `metadata`
+                        WHERE `source` = 'repository'
+                        AND `field` = 'dspace.bitstream.uuid'
+                        AND `added` < %s
+                    )
+                    AND `added` >= %s
+                """
+                params.extend([start_date, start_date])
+            elif end_date:
+                # Only end date: records added on or before end
+                query += """
+                    AND `added` <= %s
+                """
+                params.append(end_date)
+
+            query += """
                     AND `deleted` IS NULL
                 )
             """
-            params.extend([from_date, from_date])
 
         results = self.execute_query(query, tuple(params))
         return [row['idInSource'] for row in results]

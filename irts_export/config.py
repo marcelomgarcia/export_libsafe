@@ -70,9 +70,9 @@ class Config:
             )
 
         # Validate export directory exists or can be created
-        if not cls.SDAIA_EXPORT_DIRECTORY.exists():
+        if not cls.LIBSAFE_EXPORT_DIRECTORY.exists():
             raise ValueError(
-                f"Export directory does not exist: {cls.SDAIA_EXPORT_DIRECTORY}"
+                f"Export directory does not exist: {cls.LIBSAFE_EXPORT_DIRECTORY}"
             )
 
         return True

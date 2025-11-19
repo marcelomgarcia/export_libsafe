@@ -57,17 +57,24 @@ export_libsafe/
 
 ### 1. Install Python Dependencies
 
+This project uses `uv` for fast dependency management. If you don't have `uv` installed:
+
 ```bash
-cd /home/garcm0b/Work/export_libsafe
-pip install -r requirements.txt
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Or with virtual environment (recommended):
+Then sync dependencies:
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+cd /home/garcm0b/Work/export_libsafe
+uv sync
+```
+
+To add new packages:
+
+```bash
+uv add <package_name>
 ```
 
 ### 2. Configure Environment Variables
@@ -91,22 +98,74 @@ ls -la /data/exports/libsafe/
 
 ## Usage
 
+This project uses `uv` for package management. Run the script with:
+
+```bash
+uv run python export_libsafe.py [OPTIONS]
+```
+
 ### Basic Export (All Unembargoed Records)
 
 ```bash
-python export_libsafe.py
+uv run python export_libsafe.py
 ```
 
-### Export Records Added After Specific Date
+### Limit Number of Files to Download
+
+Download only a specific number of files (useful for testing):
 
 ```bash
-python export_libsafe.py --from-date 2024-01-01
+# Download only 10 files
+uv run python export_libsafe.py -n 10
+
+# Download 50 files
+uv run python export_libsafe.py --number 50
+```
+
+Note: `0` (default) means unlimited. The limit only counts successfully downloaded files, not skipped ones.
+
+### Filter by Date Range
+
+Export records added within a specific date range:
+
+```bash
+# Records from Jan 10-15, 2025
+uv run python export_libsafe.py -s 2025-01-10 -e 2025-01-15
+
+# Records added on or after Jan 10, 2025
+uv run python export_libsafe.py --start 2025-01-10
+
+# Records added on or before Jan 15, 2025
+uv run python export_libsafe.py --end 2025-01-15
+
+# Legacy syntax (backward compatible)
+uv run python export_libsafe.py --from-date 2025-01-10
+```
+
+### Combine Options
+
+You can combine multiple options:
+
+```bash
+# 10 files from a specific date range with verbose logging
+uv run python export_libsafe.py -s 2025-01-10 -e 2025-01-15 -n 10 --verbose
+
+# 25 files added after Jan 1, 2025
+uv run python export_libsafe.py --start 2025-01-01 --number 25
 ```
 
 ### Enable Verbose Logging
 
 ```bash
-python export_libsafe.py --verbose
+uv run python export_libsafe.py --verbose
+# or
+uv run python export_libsafe.py -v
+```
+
+### View All Options
+
+```bash
+uv run python export_libsafe.py --help
 ```
 
 ### Resume After Crash
@@ -117,7 +176,8 @@ Simply re-run the same command. The script will:
 3. Continue from where it left off
 
 ```bash
-uv run export_libsafe.py --verbose
+# Resume with same options
+uv run python export_libsafe.py -s 2025-01-10 -n 100 --verbose
 ```
 
 ## How It Works

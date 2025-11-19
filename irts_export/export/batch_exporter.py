@@ -203,23 +203,36 @@ class BatchExporter:
 
     def export_batch(
         self,
-        from_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 0,
     ) -> Dict[str, Any]:
         """
         Export metadata and files in batches with incremental CSV writing
 
         Args:
-            from_date: Optional date filter in YYYY-MM-DD format
+            start_date: Optional start date filter in YYYY-MM-DD format (inclusive)
+            end_date: Optional end date filter in YYYY-MM-DD format (inclusive)
+            limit: Maximum number of files to download (0 = unlimited)
 
         Returns:
             Dictionary with export statistics
         """
         self.start_time = time.time()
 
-        # Validate date if provided
-        if from_date:
-            from_date = validate_date(from_date)
-            logger.info(f"Filtering records added after: {from_date}")
+        # Validate dates if provided
+        if start_date:
+            start_date = validate_date(start_date)
+        if end_date:
+            end_date = validate_date(end_date)
+
+        # Log date filter
+        if start_date and end_date:
+            logger.info(f"Filtering records added between {start_date} and {end_date}")
+        elif start_date:
+            logger.info(f"Filtering records added on or after {start_date}")
+        elif end_date:
+            logger.info(f"Filtering records added on or before {end_date}")
 
         # Get today's date for embargo check
         today = datetime.now().strftime('%Y-%m-%d')
@@ -231,10 +244,15 @@ class BatchExporter:
         existing_in_csv = self._get_existing_handles_from_csv(csv_path)
         existing_files = self._get_existing_files()
 
+        # Track downloaded files for limit
+        downloaded_count = 0
+
         # Get handles to export
         logger.info("Fetching handles from database...")
-        all_handles = self.db.get_handles_for_export(from_date)
+        all_handles = self.db.get_handles_for_export(start_date, end_date)
         logger.info(f"Found {len(all_handles)} total handles")
+        if limit > 0:
+            logger.info(f"Download limit: {limit} files")
 
         # Filter out embargoed handles
         embargoed = self.db.get_embargoed_handles(today)
@@ -254,6 +272,11 @@ class BatchExporter:
         try:
             # Process each handle with progress bar
             for handle in tqdm(handles, desc="Exporting", unit="record"):
+                # Check if limit reached
+                if limit > 0 and downloaded_count >= limit:
+                    logger.info(f"Download limit of {limit} files reached. Stopping export.")
+                    break
+
                 self.stats['total'] += 1
 
                 # Validate handle
@@ -297,6 +320,7 @@ class BatchExporter:
                     csv_file.flush()
                     logger.info(f"Added existing file to CSV: {handle}")
                     self.stats['success'] += 1
+                    downloaded_count += 1
                     continue
 
                 # Download file
@@ -317,6 +341,7 @@ class BatchExporter:
                         csv_file.flush()  # Force write to disk
 
                         self.stats['success'] += 1
+                        downloaded_count += 1
                         logger.info(f"✓ Added {handle} to CSV")
 
                         # Only download the first successful file
@@ -342,6 +367,8 @@ class BatchExporter:
             'errors': self.stats['errors'],
             'elapsed_seconds': elapsed,
             'csv_path': str(csv_path),
+            'limit': limit,
+            'limit_reached': limit > 0 and downloaded_count >= limit,
         }
 
         logger.info(f"Export complete: {summary}")
