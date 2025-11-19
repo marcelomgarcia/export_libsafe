@@ -55,16 +55,17 @@ class DatabaseConnection:
     def connect(self):
         """Establish database connection"""
         try:
-            self.connection = pymysql.connect(  # type: ignore[call-overload]
+            # Connection matching working mysql command pattern
+            self.connection = pymysql.connect(
                 host=self.host,
-                user=self.user,
-                port=self.port,
-                password=self.password,
                 database=self.database,
+                user=self.user,
+                password=self.password,
+                port=self.port,
                 charset='utf8mb4',
                 cursorclass=DictCursor,
             )
-            logger.info(f"Connected to database: {self.database}")
+            logger.info(f"Connected to database: {self.database} at {self.host}:{self.port}")
         except pymysql.Error as e:
             raise DatabaseError(f"Failed to connect to database: {e}") from e
 
