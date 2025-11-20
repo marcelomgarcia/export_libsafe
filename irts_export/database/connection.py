@@ -30,7 +30,7 @@ class DatabaseConnection:
         self,
         host: str = "",
         user: str = "",
-        port: int = 3306,
+        port: Optional[int] = None,
         password: str = "",
         database: str = "",
     ):
@@ -40,13 +40,13 @@ class DatabaseConnection:
         Args:
             host: MySQL server hostname
             user: MySQL username
-            port: MySQL port
+            port: MySQL port (defaults to Config.MYSQL_PORT if not provided)
             password: MySQL password
             database: Database name
         """
         self.host = host or Config.MYSQL_SERVER_IP
         self.user = user or Config.MYSQL_USER
-        self.port = port or Config.MYSQL_PORT
+        self.port = port if port is not None else Config.MYSQL_PORT
         self.password = password or Config.MYSQL_PASSWORD
         self.database = database or Config.IRTS_DATABASE
 
